@@ -1,13 +1,11 @@
 import sqlite3
 import os
-from threading import Lock
 
 class URLManger:
     BASE58_ALPHABET = '123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz'
 
     def __init__(self):
         self.__db_path = "urls.db"
-        self.__lock = Lock()
         if not os.path.exists(self.__db_path):
             self.__init_db()
 
@@ -73,15 +71,11 @@ class URLManger:
         if result_url is not None:
             return result_url[0]
 
-        with self.__lock:
-            result_url = self.__base58_encode(self.__sequencer)
-            self.__sequencer += 1
+        with sqlite3.connect(self.__db_path) as con:
+            cursor = con.cursor()
+            cursor.execute('''
+                INSERT INTO urls (ID, url)
+                        VALUES (?, ?)
+            ''', (result_url, url))
 
-            with sqlite3.connect(self.__db_path) as con:
-                cursor = con.cursor()
-                cursor.execute('''
-                    INSERT INTO urls (ID, url)
-                            VALUES (?, ?)
-                ''', (result_url, url))
-
-            return result_url
+        return result_url
