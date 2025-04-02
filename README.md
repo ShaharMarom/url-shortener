@@ -51,6 +51,25 @@ pip install -r requirements.txt
 uvicorn main:app --host 0.0.0.0 --port 8000
 ```
 
+## Running Tests
+
+1. Install test dependencies (if you haven't already):
+```bash
+pip install -r requirements.txt
+```
+
+2. Run the tests:
+```bash
+PYTHONPATH=. pytest test_main.py -v
+```
+
+For more detailed test output, you can use:
+```bash
+PYTHONPATH=. pytest test_main.py -v --capture=no
+```
+
+Note: The tests will automatically create and clean up a test database file (urls.db).
+
 ## API Endpoints
 
 The service runs on `http://localhost:8000` and provides the following endpoints:

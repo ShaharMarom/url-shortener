@@ -1,6 +1,17 @@
 from fastapi import FastAPI, Response, status
 from pydantic import BaseModel
 from url_manger import URLManger
+import re
+
+def is_valid_url(url: str) -> bool:
+    url_pattern = re.compile(
+        r'^(https?|ftp)://'
+        r'(([a-zA-Z0-9.-]+)\.([a-zA-Z]{2,6}))' 
+        r'(:\d+)?'
+        r'(\/\S*)?$'
+    )
+    return re.match(url_pattern, url) is not None
+
 
 class RequestUrl(BaseModel):
     url: str
@@ -8,11 +19,14 @@ class RequestUrl(BaseModel):
 app = FastAPI()
 url_manger = URLManger()
 
-
 BASE_URL = "http://localhost:8000/shorten"
 
 @app.post("/shorten")
-async def generate(req_url: RequestUrl):
+async def generate(req_url: RequestUrl, response: Response):
+    if not is_valid_url(req_url.url):
+        response.status_code = status.HTTP_400_BAD_REQUEST
+        return "Invalid URL as a parameter"
+
     short_url = url_manger.generate_short_url(url=req_url.url)
 
     return  BASE_URL + "/" + short_url
