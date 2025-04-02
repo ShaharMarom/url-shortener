@@ -1,12 +1,13 @@
 import sqlite3
 import os
-import threading
+from threading import Lock
 
 class URLManger:
     BASE58_ALPHABET = '123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz'
 
     def __init__(self):
         self.__db_path = "urls.db"
+        self.__lock = Lock()
         if not os.path.exists(self.__db_path):
             self.__init_db()
 
@@ -59,7 +60,7 @@ class URLManger:
             res = cursor.fetchone()
             return res[1] if res is not None else None
 
-    def get_url_by_long(self, url: str):
+    def __get_url_by_long(self, url: str):
         with sqlite3.connect(self.__db_path) as con:
             cursor = con.cursor()
             cursor.execute('''
@@ -68,18 +69,19 @@ class URLManger:
             return cursor.fetchone()
 
     def generate_short_url(self, url: str):
-        result_url = self.get_url_by_long(url)
+        result_url = self.__get_url_by_long(url)
         if result_url is not None:
             return result_url[0]
 
-        result_url = self.__base58_encode(self.__sequencer)
-        self.__sequencer += 1
+        with self.__lock:
+            result_url = self.__base58_encode(self.__sequencer)
+            self.__sequencer += 1
 
-        with sqlite3.connect(self.__db_path) as con:
-            cursor = con.cursor()
-            cursor.execute('''
-                INSERT INTO urls (ID, url)
-                        VALUES (?, ?)
-            ''', (result_url, url))
+            with sqlite3.connect(self.__db_path) as con:
+                cursor = con.cursor()
+                cursor.execute('''
+                    INSERT INTO urls (ID, url)
+                            VALUES (?, ?)
+                ''', (result_url, url))
 
-        return result_url
+            return result_url

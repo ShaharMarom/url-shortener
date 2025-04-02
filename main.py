@@ -30,5 +30,4 @@ async def long_url(shorten_url: str, response: Response):
 
 # TODO - add validation function for url
 # TODO - UNIT TEST
-# TODO - make url_manger.generate_short_url thread safe
 # TODO - caching mechanism
