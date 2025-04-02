@@ -59,17 +59,8 @@ The service runs on `http://localhost:8000` and provides the following endpoints
   - Request body: `{"url": "https://your-long-url.com"}`
   - Returns: Shortened URL
 
-- `GET /shorten/{short_url}`: Redirect to the original URL
+- `GET /shorten/{short_url}`: Resolve shortened URL to the orignial long URL
   - Returns: Original URL or 404 if not found
 
-## Testing the API
 
-You can test the API using curl:
 
-```bash
-# Create a shortened URL
-curl -X POST -H "Content-Type: application/json" -d '{"url":"https://example.com"}' http://localhost:8000/shorten
-
-# Retrieve original URL
-curl http://localhost:8000/shorten/{shortened_id}
-```
