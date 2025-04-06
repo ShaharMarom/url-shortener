@@ -72,7 +72,7 @@ class URLManger:
             return result_url[0]
 
         result_url = self.__base58_encode(self.__sequencer)
-        result_url = ++self.__sequencer
+        self.__sequencer += 1
 
         with sqlite3.connect(self.__db_path) as con:
             cursor = con.cursor()
