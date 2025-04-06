@@ -10,7 +10,7 @@ class URLManger:
             self.__init_db()
 
         last_url = self.__get_last_url()
-        self.__sequencer = self.__base58_decode(last_url[0]) if last_url is not None else 0
+        self.__sequencer = self.__base58_decode(last_url[0]) + 1 if last_url is not None else 0
 
 
     def __init_db(self):
