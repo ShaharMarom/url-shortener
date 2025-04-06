@@ -71,6 +71,8 @@ class URLManger:
         if result_url is not None:
             return result_url[0]
 
+        result_url = self.__base58_encode(self.__sequencer)
+
         with sqlite3.connect(self.__db_path) as con:
             cursor = con.cursor()
             cursor.execute('''
